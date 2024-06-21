@@ -1,1 +1,1 @@
-web: unicorn zavrsni.wsgi --log-file -
+web: gunicorn zavrsni.wsgi --log-file -
