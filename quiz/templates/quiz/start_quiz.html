@@ -1,0 +1,71 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+{% if question_type == 'one_choice' %}
+    <form action="{% url 'quiz:start_quiz' quiz_code question_number%}" method="post" class="next_question_button">
+        {% csrf_token %}
+        <input type="hidden" id="type" name="type" value="one_choice">
+        <button type="submit" id="next_question_button">Next Question</button>
+    </form>
+    <div class="question_display">
+        <h1>{{ question_text }}</h1>
+        {% if question.image_url %}
+            <img src="{{ question.image_url }}" alt="{{ question.image_url }}" width="500px" style="margin-left: auto; margin-right: auto; display: block;">
+        {% endif %}
+        {% for answer_key, answer_value in question.answers.items %}
+            <div class="answer_display">
+                <p>{{ answer_value.text }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    <div id="countdown">10</div>
+{% else %} 
+<form action="{% url 'quiz:start_quiz' quiz_code question_number%}" method="post" class="next_question_button">
+    {% csrf_token %}
+        <input type="hidden" id="type" name="type" value="anonymous">
+        <button type="submit" id="next_question_button">Next Question</button>
+    </form>
+    <div id="anonymousQuestionAnswers" class="question_display">
+        <h1>{{question_text}}</h1>
+        {% for answer_key, answer_value in question.answers.items %}
+            <div class="answer_display">
+                <p>{{ answer_value }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var quiz_code = '{{ quiz_code }}';
+        var question_number = '{{ question_number }}' - 1;
+        var question_type = '{{ question_type }}';
+        function refreshQuizList() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/ajax/quiz_question/' + quiz_code + '/' + question_number +'/', true);
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    document.getElementById('anonymousQuestionAnswers').innerHTML = this.responseText;
+                }
+            };
+            xhr.send();
+        }
+        if (question_type == 'anonymous') {
+            setInterval(refreshQuizList, 1000);
+        }
+    });
+    {% if question_type == "one_choice" %}
+        function clickButton() {
+            document.getElementById('next_question_button').click();
+        }
+
+        setTimeout(clickButton, 10000);
+
+        var countdownElement = document.getElementById('countdown');
+        var countdown = 10;
+        function updateCountdown() {
+            countdown -= 1;
+            countdownElement.innerHTML = countdown;
+        }
+        setInterval(updateCountdown, 1000);
+    {% endif %}
+</script>
+{% endblock %}

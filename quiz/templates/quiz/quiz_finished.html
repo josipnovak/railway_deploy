@@ -1,0 +1,12 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<h1>Quiz finished</h1>
+<div class="players_finish_screen">
+{% for player in players %}
+    <div class="player">
+        <h2>{{ player.player_name }}</h2>
+        <p>Score: {{ player.points }}</p>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}

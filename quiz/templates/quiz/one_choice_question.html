@@ -1,0 +1,55 @@
+{% extends "quiz/base_players.html" %}
+{% block content %}
+{{ question }}
+{% for answer_key, answer_value in answers.items %}
+    <form action="{% url 'quiz:one_choice_question' quiz_id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="device_token" name="device_token">
+        <input type="hidden" id="answer" name="answer" value="{{ answer_value.correct }}">
+        <button type="submit">{{ answer_value.text }}</button>
+    </form>
+{% endfor %}
+      <form action="{% url 'quiz:one_choice_question' quiz_id %}" method="post" style="display: none"> 
+        {% csrf_token %}
+        <input type="hidden" id="device_token" name="device_token">
+        <input type="hidden" id="time_run_out" name="time_run_out" value="true">
+        <button type="submit" id="time_run_out_submit">Submit</button>
+    </form>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-messaging.js"></script>
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyBcSUZ0zXsAEOY9t4PL82NqBKdGJFZgsX0",
+    authDomain: "zavrsni-proba-1.firebaseapp.com",
+    databaseURL: "https://zavrsni-proba-1-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "zavrsni-proba-1",
+    storageBucket: "zavrsni-proba-1.appspot.com",
+    messagingSenderId: "649829209184",
+    appId: "1:649829209184:web:343823581c648622d65f05"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const messaging = firebase.messaging();
+
+  messaging.requestPermission()
+    .then(function() {
+      console.log('Notification permission granted.');
+      return messaging.getToken();
+    })
+    .then(function(token) {
+      console.log('FCM Token:', token);
+      var deviceTokens = document.getElementsByName('device_token');
+        for (var i = 0; i < deviceTokens.length; i++) {
+            deviceTokens[i].value = token;
+        }
+    })
+    .catch(function(err) {
+      console.log('Unable to get permission to notify.', err);
+    });
+
+    messaging.onMessage((payload) => {
+      document.getElementById('time_run_out_submit').click();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<h1 style="text-align: center;">Create new quiz</h1>
+{% if request.session.token %}
+   <form action="{% url 'quiz:add_one_choice' %}" method="post" class="create_quiz_form">
+       {% csrf_token %}
+       <label for="quizName">Name</label>
+       <input type="text" name="quizName" id="quizName" placeholder="Enter name" required>
+       <label for="quizDescription">Description</label>
+       <input type="text" name="quizDescription" id="quizDescription" placeholder="Enter description" required><br>
+       <div id="questions" class="questions_list"></div>
+        <button id="addNewQuestion">Add one choice question</button>
+       <button type="submit">Add new quiz</button> 
+   </form>
+   <script>
+    let questionCount = 0;
+    
+    document.getElementById('addNewQuestion').addEventListener('click', function() {
+        event.preventDefault();
+
+        const questionDiv = document.createElement('div');
+        questionDiv.innerHTML = `
+            {% load static%}
+            <label for="quizQuestions">Question</label>
+            <input type="text" name="quizQuestion" id="quizQuestion" placeholder="Enter question" required>
+            <button id="add_image_button${questionCount}" type="buttons">Add image</button>
+            <div id="image_input${questionCount}", style="display: none">
+                <label for="image_url">Image URL</label>
+                <input type="text" name="image_url${questionCount}" id="image_url" placeholder="Enter image URL" value="">
+            </div>
+            <input type="hidden" name="questionCount" value="${questionCount}">
+            <label for="quizAnswers">Answers</label>
+            <input type="checkbox" name="answer1Correct${questionCount}" value="True">
+            <input type="text" name="quizAnswer1" id="" placeholder="Enter answer" required>
+            <input type="checkbox" name="answer2Correct${questionCount}" value="True">
+            <input type="text" name="quizAnswer2" id="" placeholder="Enter answer" required>
+            <input type="checkbox" name="answer3Correct${questionCount}" value="True">
+            <input type="text" name="quizAnswer3" id="" placeholder="Enter answer" required>
+            <input type="checkbox" name="answer4Correct${questionCount}" value="True">
+            <input type="text" name="quizAnswer4" id="" placeholder="Enter answer" required>
+            <button class="remove_question" id="remove_question">
+                <img src={% static 'quiz/delete_icon.png' %} alt="Remove question" width="20px" height="20px">
+            </button><br>
+        `;
+        
+        document.getElementById('questions').appendChild(questionDiv);
+        
+        questionDiv.querySelector('.remove_question').addEventListener('click', function() {
+            questionDiv.remove();
+        });
+        
+        const addButton = document.getElementById('add_image_button' + questionCount);
+        const imageInput = document.getElementById('image_input' + questionCount);
+        
+        addButton.addEventListener('click', function() {
+            imageInput.style.display = 'inline';
+            addButton.style.display = 'none';
+        });
+        
+        questionCount++;
+    });
+
+    </script>
+{% endif %}
+{% endblock %}

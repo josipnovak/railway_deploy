@@ -1,0 +1,8 @@
+<div id="anonymousQuestionAnswers" class="question_display">
+    <h1>{{question_text}}</h1>
+    {% for answer_key, answer_value in question.answers.items %}
+        <div class="answer_display">
+            <p>{{ answer_value }}</p>
+        </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,22 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<a href="{% url 'quiz:start_screen' quiz_id %}" class="start_quiz_button">Start quiz</a>
+<div class="quiz_details">
+<h1>{{ quiz.name }}</h1>
+<p>{{ quiz.description }}</p>
+    {% for question in quiz.questions %}
+        <div class="quiz_details_question">
+            {{ question.text }}
+            {% if question.image_url %}
+                <img src={{ question.image_url }} alt="{{ question.image_url }}" width="300px">
+            {% endif %}
+            <br>
+            {% for answer_key, answer_value in question.answers.items %}
+                Answer: {{ answer_value.text }}
+                Correct: {{ answer_value.correct }}<br>
+            {% endfor %}
+            <br>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

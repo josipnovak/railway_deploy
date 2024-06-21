@@ -1,0 +1,36 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<form action="{% url 'quiz:start_quiz_answer' code_for_enter first_question%}" method="post" class="next_question_button">
+    {% csrf_token %}
+    <button type="submit">Start quiz</button>
+</form>
+<div id="players-list">
+    <div class="quiz_start_screen">
+        <h1>Code for enter {{ code_for_enter }}</h1>
+        <h2>{{ quiz.name }}</h2>
+        {% for player in players %}
+            <div class="player_start_screen">
+                {{ player.player_name }}<br>
+            </div>
+        {% endfor %}
+        {{ players|length }} players
+    </div>
+</div>
+<img src="{{ img_data_url }}" alt="QR Code"><br>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var quiz_code = '{{ quiz_id }}';
+        function refreshQuizList() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/ajax/players_list/' + quiz_code + '/', true);
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    document.getElementById('players-list').innerHTML = this.responseText;
+                }
+            };
+            xhr.send();
+        }
+        setInterval(refreshQuizList, 1000);  
+    });
+</script>
+{% endblock %}

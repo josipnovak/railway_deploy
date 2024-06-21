@@ -1,0 +1,170 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+
+    <label for="name">Name </label>
+    <input type="text" name="name" id="name" placeholder="Enter name"><br>
+    <label for="description">Description</label>
+    <input type="text" name="description" id="description" placeholder="Enter description"><br>
+    <label for="code">Code</label>
+    <input type="text" name="code" id="code" placeholder="Enter code">
+    <div id="questionForm"></div>
+    <button id="addNewQuestion">Add question</button><br>
+    <button id="saveQuiz">Add to database</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcSUZ0zXsAEOY9t4PL82NqBKdGJFZgsX0",
+            authDomain: "zavrsni-proba-1.firebaseapp.com",
+            databaseURL: "https://zavrsni-proba-1-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "zavrsni-proba-1",
+            storageBucket: "zavrsni-proba-1.appspot.com",
+            messagingSenderId: "649829209184",
+            appId: "1:649829209184:web:343823581c648622d65f05"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        let name = document.getElementById('name');
+        let description = document.getElementById('description');
+        let code = document.getElementById('code');
+
+        function saveToDatabase() {
+            if ( Number(code.value) < 100000 || Number(code.value) > 999999 || isNaN(Number(code.value))) {
+                alert('Code must be 6 digits long or you wrote a letter or a symbol. Please try again.');
+                return;
+            }
+            const quizRef = ref(database, 'quizzes/' + Number(code.value));
+            get(quizRef).then((snapshot) => {
+                let data = {};
+                if (snapshot.exists()) {
+                    data = snapshot.val();
+                }
+                if (!data.questions) {
+                    data.questions = [];
+                }
+
+                const forms = document.querySelectorAll('form');
+                forms.forEach((form) => {
+                    const question = form.querySelector('input[name="question"]').value;
+                    const answers = Array.from(form.querySelectorAll('input[name^="answer"]')).map(input => input.value);
+                    data.questions.push({ question, answers });
+                });
+                set(quizRef, data)
+            });
+
+            set(ref(database, 'quizzes/' + Number(code.value)), {
+                name: name.value,
+                description: description.value,
+            }).then(() => {
+                alert('Data saved');
+            }).catch((error) => {
+                alert('Data not saved', error);
+            });
+        }
+        function getData() {
+            get(child(ref(database), 'quizzes')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    var data = snapshot.val();
+                    var nesta = "";
+                    for (var key in data){
+                        nesta+=("Quiz name: " + data[key].name + "<br>" + "Quiz description: " + data[key].description + "<br><br>");
+                    }
+                    document.getElementById('displayData').innerHTML = nesta;
+                } else {
+                    console.log('No data available');
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+
+        }
+        
+        function addQuestion(){
+            var form = document.createElement('form');
+            var question = document.createElement('input');
+            var answer1 = document.createElement('input');
+            var checkBox1 = document.createElement('input');
+            var answer2 = document.createElement('input');
+            var checkBox2 = document.createElement('input');
+            var answer3 = document.createElement('input');
+            var checkBox3 = document.createElement('input');
+            var answer4 = document.createElement('input');
+            var checkBox4 = document.createElement('input');
+            var deleteQuestion = document.createElement('button');
+
+            question.setAttribute('type', 'text');
+            question.setAttribute('name', 'question');
+            question.setAttribute('placeholder', 'Enter your question here');
+
+            answer1.setAttribute('type', 'text');
+            answer1.setAttribute('name', 'answer1');
+            answer1.setAttribute('placeholder', 'Enter answer 1');
+            answer1.setAttribute('required', 'required');
+
+            checkBox1.setAttribute('type', 'checkbox');
+            checkBox1.setAttribute('name', 'checkBox1');
+            checkBox1.setAttribute('value', '0');
+
+            answer2.setAttribute('type', 'text');
+            answer2.setAttribute('name', 'answer2');
+            answer2.setAttribute('placeholder', 'Enter answer 2');
+            answer2.setAttribute('required', 'required');
+
+            checkBox2.setAttribute('type', 'checkbox');
+            checkBox2.setAttribute('name', 'checkBox2');
+            checkBox2.setAttribute('value', '0');
+
+            answer3.setAttribute('type', 'text');
+            answer3.setAttribute('name', 'answer3');
+            answer3.setAttribute('placeholder', 'Enter answer 3');
+            answer3.setAttribute('required', 'required');
+
+            checkBox3.setAttribute('type', 'checkbox');
+            checkBox3.setAttribute('name', 'checkBox3');
+            checkBox3.setAttribute('value', '0');
+
+            answer4.setAttribute('type', 'text');
+            answer4.setAttribute('name', 'answer4');
+            answer4.setAttribute('placeholder', 'Enter answer 4');
+            answer4.setAttribute('required', 'required');
+
+            checkBox4.setAttribute('type', 'checkbox');
+            checkBox4.setAttribute('name', 'checkBox4');
+            checkBox4.setAttribute('value', '0');
+
+            deleteQuestion.setAttribute('type', 'button');
+            deleteQuestion.setAttribute('id', 'deleteQuestion');
+            deleteQuestion.innerHTML = 'Delete question';  
+            
+            deleteQuestion.addEventListener('click', function() {
+                deleteQuestions(form);
+            });
+
+            form.appendChild(question);
+            form.appendChild(document.createElement('br'));
+            form.appendChild(checkBox1);
+            form.appendChild(answer1);
+            form.appendChild(checkBox2);
+            form.appendChild(answer2);
+            form.appendChild(checkBox3);
+            form.appendChild(answer3);
+            form.appendChild(checkBox4);
+            form.appendChild(answer4);
+            form.appendChild(deleteQuestion);
+
+            document.body.appendChild(form);
+        }
+
+        function deleteQuestions(form){
+            form.remove();
+        }
+
+        saveQuiz.addEventListener('click', saveToDatabase);
+        //dataDisplay.addEventListener('' , getData);
+        addNewQuestion.addEventListener('click', addQuestion);
+    </script>
+
+{% endblock %}

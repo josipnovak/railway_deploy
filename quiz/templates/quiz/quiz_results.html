@@ -1,0 +1,19 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<h1>{{ quiz.quiz_name }}</h1>
+{% for question in quiz.answers %}
+    {{ question.text }}
+    <br>
+    {% for key, value in question.answers.items %}
+        {{ value }}
+        <br>
+    {% endfor %}
+{% endfor %}
+{% for player in quiz.answers %}
+    {% if player.player_name %}
+        <p>{{ player.player_name }}: {{ player.points }} points</p>
+    {% endif %}
+{% endfor %}
+<a href="{% url 'quiz:export_results' quiz.id %}" style="color: white; text-decoration: none; float: right">Export Results</a>
+
+{% endblock %}

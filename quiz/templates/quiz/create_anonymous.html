@@ -1,0 +1,47 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<h1 style="text-align: center;">Create new quiz</h1>
+{% if request.session.token %}
+   <form action="{% url 'quiz:add_anonymous' %}" method="post" class="create_quiz_form">
+       {% csrf_token %}
+       <label for="quizName">Name</label>
+       <input type="text" name="quizName" id="quizName" placeholder="Enter name" required>
+       <label for="quizDescription">Description</label>
+       <input type="text" name="quizDescription" id="quizDescription" placeholder="Enter description" required><br>
+       <div id="questions" class="questions_list"></div>
+        <button type="button" id="anonymousQuestion">Add anonymous question</button>
+       <button type="submit">Add new quiz</button> 
+   </form>
+   <script>
+    let questionCount = 0;
+    document.getElementById('anonymousQuestion').addEventListener('click', function() {
+        event.preventDefault();
+
+        const questionDiv = document.createElement('div');
+        questionDiv.innerHTML = `
+            {% load static%}
+            <label for="quizQuestion${questionCount}">Question</label>
+            <input type="text" name="quizQuestion" id="quizQuestion${questionCount}" placeholder="Enter question">
+            <input type="hidden" name="questionCount" value="${questionCount}">
+            <input type="hidden" name="answer1Correct${questionCount}" value="null">
+            <input type="hidden" name="quizAnswer1" id="" placeholder="Enter answer">
+            <input type="hidden" name="answer2Correct${questionCount}" value="null">
+            <input type="hidden" name="quizAnswer2" id="" placeholder="Enter answer">
+            <input type="hidden" name="answer3Correct${questionCount}" value="null">
+            <input type="hidden" name="quizAnswer3" id="" placeholder="Enter answer">
+            <input type="hidden" name="answer4Correct${questionCount}" value="null">
+            <input type="hidden" name="quizAnswer4" id="" placeholder="Enter answer">
+            <button class="remove_question" id="remove_question">
+                <img src={% static 'quiz/delete_icon.png' %} alt="Remove question" width="20px" height="20px">
+            </button><br>
+        `;
+        document.getElementById('questions').appendChild(questionDiv);
+        questionCount++;
+
+        questionDiv.querySelector('.remove_question').addEventListener('click', function() {
+            questionDiv.remove();
+        });
+    })
+    </script>
+{% endif %}
+{% endblock %}

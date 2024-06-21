@@ -1,0 +1,9 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<form action="{% url 'quiz:start_quiz_answer' quiz_code question_number%}" method="post" class="next_question_button">
+    {% csrf_token %}
+    <button type="submit">Next Question</button>
+</form>
+{{ question_text }}<br>
+{{ correct_answer }}
+{% endblock %}

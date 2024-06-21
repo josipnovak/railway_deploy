@@ -1,0 +1,8 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+{% if request.session.token %}
+    <h1>{{ user }}, welcome to the quiz app!</h1>
+{% else %}
+    <h1>Welcome to the quiz app!</h1>
+{% endif %}
+{% endblock %}

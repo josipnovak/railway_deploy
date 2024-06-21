@@ -1,0 +1,21 @@
+{% extends "quiz/base.html" %}
+{% block content %}
+<div id="finished_quiz_list">
+    <h1>Finished quizzes</h1>
+    <ul>
+        {% for quiz in quizzes %}
+        <a href="{% url 'quiz:quiz_results' quiz.id %}">
+            <div class="quiz_link">
+                Quiz name
+                {{ quiz.quiz_name }}
+                <br>
+                {{ quiz.created_at}}
+                {% comment %} <br>
+                {{ quiz.questions|length }} questions {% endcomment %}
+                <br>
+            </div>
+        </a>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

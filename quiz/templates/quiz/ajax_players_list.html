@@ -1,0 +1,12 @@
+<div id="players-list">
+    <div class="quiz_start_screen">
+        <h1>Code for enter {{ code_for_enter }}</h1>
+        <h2>{{ quiz.name }}</h2>
+        {% for player in players %}
+            <div class="player_start_screen">
+                {{ player.player_name }}<br>
+            </div>
+        {% endfor %}
+        {{ players|length }} players
+    </div>
+</div>
